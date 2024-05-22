@@ -8,6 +8,7 @@ export function searchPhoto(query) {
     image_type: 'photo',
     orientation: 'horizontal',
     safesearch: 'true',
+    per_page: 15,
   });
 
   const url = `${BASE_URL}${END_POINT}?${params}`;
