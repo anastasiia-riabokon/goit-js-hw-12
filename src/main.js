@@ -43,8 +43,6 @@ function handleSubmitPhotoRequest(event) {
   ref.body.style.height = '100vh';
   ref.containerImg.innerHTML = '';
 
-  hideElement(ref.btnLoadMore);
-
   currentPage = 1;
 
   query = elementOfForm.elements.query.value.trim();
@@ -81,8 +79,9 @@ async function uploadPhoto(query) {
       renderMarkup(ref.containerImg, result.hits);
 
       showElement(ref.pagination);
-      paginationPage(currentPage, maxPage);
       showElement(ref.btnLoadMore);
+
+      paginationPage(currentPage, maxPage);
 
       if (result.hits.length < 4) {
         ref.body.style.height = '100vh';
@@ -99,24 +98,13 @@ async function uploadPhoto(query) {
   } finally {
     hideElement(ref.cssLoader);
   }
-  status();
-}
 
-function status() {
-  if (currentPage >= maxPage) {
-    hideElement(ref.btnLoadMore);
-    if (hits.length < 4) return;
-    message({
-      text: "We're sorry, but you've reached the end of search results.",
-      type: 'info',
-    });
-  }
+  status();
 }
 
 async function handleClickPhotoReload() {
   hideElement(ref.btnLoadMore);
   showElement(ref.cssLoader);
-  hideElement(ref.pagination);
 
   try {
     currentPage += 1;
@@ -124,7 +112,6 @@ async function handleClickPhotoReload() {
     const result = await searchPhoto(query, currentPage);
     renderMarkup(ref.containerImg, result.hits);
 
-    showElement(ref.pagination);
     showElement(ref.btnLoadMore);
 
     scrollAutoAfterClickOnBtn();
@@ -138,7 +125,74 @@ async function handleClickPhotoReload() {
     hideElement(ref.cssLoader);
   }
   status();
-  hideElement(ref.pagination);
+}
+
+function handlePaginationClick(event) {
+  const activeEl = ref.pagination.querySelector('.active');
+  const currentEl = event.target;
+
+  if (currentEl.dataset.type === 'page') {
+    const pageNumber = parseInt(currentEl.dataset.page);
+
+    if (pageNumber !== currentPage) {
+      currentPage = pageNumber;
+      ref.containerImg.innerHTML = '';
+      ref.body.style.height = '100vh';
+      uploadPhoto(query, currentPage);
+    }
+  }
+
+  if (
+    currentEl.dataset.type === 'prev' &&
+    activeEl.previousElementSibling.dataset.type === 'page'
+  ) {
+    updateActivePage(currentEl, activeEl);
+  }
+
+  if (
+    currentEl.dataset.type === 'next' &&
+    activeEl.nextElementSibling.dataset.type === 'page'
+  ) {
+    updateActivePage(currentEl, activeEl);
+  }
+}
+
+function updateActivePage(currentBtn, activeBtn) {
+  activeBtn.classList.remove('active');
+
+  if (currentBtn.dataset.type === 'page') {
+    currentBtn.classList.add('active');
+    return;
+  }
+
+  if (currentBtn.dataset.type === 'next') {
+    activeBtn.nextElementSibling.classList.add('active');
+    currentPage += 1;
+  } else {
+    activeBtn.previousElementSibling.classList.add('active');
+    currentPage -= 1;
+  }
+
+  if (currentPage < 1 || currentPage > maxPage) return;
+
+  ref.containerImg.innerHTML = '';
+  ref.body.style.height = '100vh';
+  uploadPhoto(query, currentPage);
+}
+
+function paginationPage(currentPage, maxPage) {
+  ref.pagination.innerHTML = renderMarkupPagination(currentPage, maxPage);
+}
+
+function status() {
+  if (currentPage >= maxPage) {
+    hideElement(ref.btnLoadMore);
+    if (hits.length < 4) return;
+    message({
+      text: "We're sorry, but you've reached the end of search results.",
+      type: 'info',
+    });
+  }
 }
 
 function showElement(element) {
@@ -193,65 +247,4 @@ function scrollAutoAfterClickOnBtn() {
     top: heightEl * 2,
     behavior: 'smooth',
   });
-}
-
-function handlePaginationClick(event) {
-  const activeEl = ref.pagination.querySelector('.active');
-  const currentEl = event.target;
-
-  if (currentEl.dataset.type === 'page') {
-    const pageNumber = parseInt(currentEl.dataset.page);
-
-    if (pageNumber !== currentPage) {
-      currentPage = pageNumber;
-      ref.containerImg.innerHTML = '';
-      ref.body.style.height = '100vh';
-      uploadPhoto(query, currentPage);
-    }
-  }
-
-  if (
-    currentEl.dataset.type === 'prev' &&
-    activeEl.previousElementSibling.dataset.type === 'page'
-  ) {
-    updateActivePage(currentEl, activeEl);
-  }
-
-  if (
-    currentEl.dataset.type === 'next' &&
-    activeEl.nextElementSibling.dataset.type === 'page'
-  ) {
-    updateActivePage(currentEl, activeEl);
-  }
-}
-
-function updateActivePage(currentBtn, activeBtn) {
-  activeBtn.classList.remove('active');
-
-  if (currentBtn.dataset.type === 'page') {
-    currentBtn.classList.add('active');
-    return;
-  }
-
-  if (currentBtn.dataset.type === 'next') {
-    activeBtn.nextElementSibling.classList.add('active');
-    currentPage += 1;
-  } else {
-    activeBtn.previousElementSibling.classList.add('active');
-    currentPage -= 1;
-  }
-
-  if (currentPage < 1 || currentPage >= maxPage) return;
-
-  ref.containerImg.innerHTML = '';
-  ref.body.style.height = '100vh';
-  uploadPhoto(query, currentPage);
-}
-
-function paginationPage(currentPage, maxPage) {
-  if (hits.length > perPage - 1) {
-    ref.pagination.innerHTML = renderMarkupPagination(currentPage, maxPage);
-  } else {
-    ref.pagination.innerHTML = '';
-  }
 }
