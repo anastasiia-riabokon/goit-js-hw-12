@@ -238,6 +238,7 @@ function updateActivePage(currentBtn, activeBtn) {
   }
 
   if (currentPage < 1 || currentPage >= maxPage) {
+    hideElement(ref.btnLoadMore);
     return;
   }
 
