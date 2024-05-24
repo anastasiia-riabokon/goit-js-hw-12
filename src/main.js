@@ -38,6 +38,9 @@ ref.pagination.addEventListener('click', handlePaginationClick);
 function handleSubmitPhotoRequest(event) {
   event.preventDefault();
 
+  hideElement(ref.btnLoadMore);
+  hideElement(ref.pagination);
+
   const elementOfForm = event.target;
 
   ref.body.style.height = '100vh';
