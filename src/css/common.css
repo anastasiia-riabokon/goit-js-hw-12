@@ -42,10 +42,33 @@ body {
   );
 }
 
+.pagination-item.active {
+  color: #f0094a;
+  background: transparent;
+  box-shadow: none;
+  border: 1px solid #f0094a;
+}
+
+.pagination-item {
+  cursor: pointer;
+}
+
+.dots {
+  color: #fff;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
 .btn:hover {
   color: #f0094a;
   background: transparent;
   box-shadow: none;
+  border: none;
 }
 .btn:before,
 .btn:after {
@@ -70,6 +93,12 @@ body {
 .btn:hover:after {
   width: 100%;
   transition: 800ms ease all;
+}
+
+.btn-load {
+  display: block;
+  margin: 0 auto;
+  margin-top: 32px;
 }
 
 .input-field {
@@ -107,4 +136,8 @@ body {
 .iziToast > .iziToast-close {
   background: url('../img/icon-close-white.svg') no-repeat 50% 50% !important;
   background-size: 16px !important;
+}
+
+.iziToast-close.custom-close {
+  background: url('../img/icon-close.svg') no-repeat 50% 50% !important;
 }

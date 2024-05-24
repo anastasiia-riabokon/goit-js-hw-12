@@ -13,12 +13,12 @@
 .gallery-item {
   display: flex;
   flex-direction: column;
-  width: calc((100% - 48px) / 3);
+  flex-basis: calc((100% - 48px) / 3);
   border: 1px solid #808080;
 }
 
 .gallery-item img {
-  height: 200px;
+  height: 150px;
 }
 
 .block-info {
