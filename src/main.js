@@ -69,6 +69,7 @@ async function uploadPhoto(query) {
     const result = await searchPhoto(query, currentPage);
 
     if (!result.hits || result.hits.length === 0) {
+      hideElement(ref.pagination);
       message({
         text: 'Sorry, there are no images matching your<br> search query. Please, try again!',
       });
