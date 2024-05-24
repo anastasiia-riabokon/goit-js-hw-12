@@ -64,6 +64,7 @@ function handleSubmitPhotoRequest(event) {
 
 async function uploadPhoto(query) {
   showElement(ref.cssLoader);
+  hideElement(ref.btnLoadMore);
   hideElement(ref.pagination);
 
   try {
@@ -79,13 +80,14 @@ async function uploadPhoto(query) {
 
       renderMarkup(ref.containerImg, result.hits);
 
-      if (result.hits.length < 4) {
-        ref.body.style.height = '100vh';
-      } else ref.body.style.height = '100%';
-
-      showElement(ref.btnLoadMore);
       showElement(ref.pagination);
       paginationPage(currentPage, maxPage);
+      showElement(ref.btnLoadMore);
+
+      if (result.hits.length < 4) {
+        ref.body.style.height = '100vh';
+        hideElement(ref.btnLoadMore);
+      } else ref.body.style.height = '100%';
 
       lightbox.refresh();
     }
@@ -97,12 +99,13 @@ async function uploadPhoto(query) {
   } finally {
     hideElement(ref.cssLoader);
   }
+  status();
 }
 
 function status() {
   if (currentPage >= maxPage) {
     hideElement(ref.btnLoadMore);
-    if (hits.length < perPage) return;
+    if (hits.length < 4) return;
     message({
       text: "We're sorry, but you've reached the end of search results.",
       type: 'info',
@@ -121,11 +124,10 @@ async function handleClickPhotoReload() {
     const result = await searchPhoto(query, currentPage);
     renderMarkup(ref.containerImg, result.hits);
 
-    showElement(ref.btnLoadMore);
     showElement(ref.pagination);
+    showElement(ref.btnLoadMore);
 
     scrollAutoAfterClickOnBtn();
-    status();
 
     paginationPage(currentPage, maxPage);
 
@@ -135,6 +137,8 @@ async function handleClickPhotoReload() {
   } finally {
     hideElement(ref.cssLoader);
   }
+  status();
+  hideElement(ref.pagination);
 }
 
 function showElement(element) {
@@ -237,10 +241,7 @@ function updateActivePage(currentBtn, activeBtn) {
     currentPage -= 1;
   }
 
-  if (currentPage < 1 || currentPage >= maxPage) {
-    hideElement(ref.btnLoadMore);
-    return;
-  }
+  if (currentPage < 1 || currentPage >= maxPage) return;
 
   ref.containerImg.innerHTML = '';
   ref.body.style.height = '100vh';
